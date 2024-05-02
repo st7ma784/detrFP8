@@ -251,6 +251,8 @@ For panoptic segmentation, DETR must learn to detect boxes for both stuff and th
 ```
 python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py --coco_path /path/to/coco  --coco_panoptic_path /path/to/coco_panoptic --dataset_file coco_panoptic --output_dir /output/path/box_model
 ```
+
+#1:40 / epoch!! 
 For instance segmentation, you can simply train a normal box model (or used a pre-trained one we provide).
 
 Once you have a box model checkpoint, you need to freeze it, and train the segmentation head in isolation.

@@ -31,6 +31,9 @@ class HungarianMatcher(nn.Module):
         self.cost_giou = cost_giou
         assert cost_class != 0 or cost_bbox != 0 or cost_giou != 0, "all costs cant be 0"
         self.counter=0
+        self.m=torch.distributions.normal.Normal(torch.tensor(-5.5),torch.tensor(2.5))
+        self.tgt=torch.distributions.half_normal.HalfNormal(0.3)
+
     @torch.no_grad()
     def forward(self, outputs, targets):
         """ Performs the matching
@@ -75,14 +78,26 @@ class HungarianMatcher(nn.Module):
 
         # Final cost matrix
         C = self.cost_bbox * cost_bbox + self.cost_class * cost_class + self.cost_giou * cost_giou
-        C = C.view(bs, num_queries, -1).cpu()
+        C = C.view(bs, num_queries, -1).cpu() #Dist=N(6,3)  Ideal is 1-|N(0,0.2)|
         self.counter+=1
         if self.counter%1000==0:
             plt.hist(C.flatten().numpy(),bins=100,label=self.counter)
             plt.title("Histogram at {}".format(self.counter))
             plt.savefig("Histogram at {}.png".format(self.counter))
         sizes = [len(v["boxes"]) for v in targets]
-        indices = [linear_sum_assignment(c[i]) for i, c in enumerate(C.split(sizes, -1))]
+        indices = [linear_sum_assignment(c[i],maximize=False) for i, c in enumerate(C.split(sizes, -1))]#C.shape is... 
+        #optimize C for FP8
+        print("C Shape is {}".format(C.shape))
+        print("sizes is {}".format(sizes))
+
+        print("output is {}".format(indices))
+        C=-C 
+        prob=self.m.cdf(-C) # using - so that the minimize LSA can become a maximize function!
+        reDistC=self.tgt.icdf(prob)
+
+
+
+
         return [(torch.as_tensor(i, dtype=torch.int64), torch.as_tensor(j, dtype=torch.int64)) for i, j in indices]
 
 
