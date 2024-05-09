@@ -13,4 +13,4 @@ jobs:
         uses: actions/checkout@v2
       - name: Save code as txt
         run: |
-          python -c "import os; os.makedirs('codeForAssistant', exist_ok=True); for root, dirs, files in os.walk('.'): if not files: continue; for file in files: if file.endswith('.py'): os.rename(os.path.join(root, file), os.path.join('codeForAssistant', file[:-3] + '.txt'))"
+          python savescript.py
