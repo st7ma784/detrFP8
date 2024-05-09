@@ -1,0 +1,24 @@
+name: Save code as txt
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'codeForAssistant/**'
+jobs:
+  save-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Save code as txt
+        run: |
+          python savescript.py
+      - name: Save files
+        run: |
+            git config --global user.email "no-reply@GitActions.com"
+            git config --global user.name "GitActor"
+            git add codeForAssistant
+            git commit -m "AutoTextFiles"
+            git push origin main
