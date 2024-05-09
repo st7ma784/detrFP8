@@ -10,6 +10,5 @@ for root, dirs, files in os.walk('.'):
             os.makedirs(os.path.join("codeForAssistant",*file.split("\\")[:-1]), exist_ok=True)
             try:
                 shutil.copy(os.path.join(root, file), os.path.join('codeForAssistant',*file.split("\\")[:-1], file.split("\\")[-1].split(".")[0] + '.txt'))
-                shutil.copy(os.path.join(root, file), os.path.join('codeForAssistant',*file.split("\\")[:-1], file.split("\\")[-1].split(".")[0] + '.txt'))
             except Exception as e:
                 print(e)
