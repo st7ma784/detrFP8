@@ -5,7 +5,8 @@ on:
     branches:
       - main
     paths:
-      - ! codeForAssistant/**
+      - **
+      - !codeForAssistant
 jobs:
   save-code:
     runs-on: ubuntu-latest
