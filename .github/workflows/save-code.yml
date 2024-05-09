@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - models/**
-      - !codeForAssistant/**
+    paths-ignore:
+      - 'codeForAssistant/**'
 jobs:
   save-code:
     runs-on: ubuntu-latest
