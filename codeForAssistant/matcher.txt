@@ -150,6 +150,17 @@ def Batch_MyLinearSumAssignment(Batched_TruthTensor:torch.Tensor,row_lookups:tor
     return Batched_TruthTensor<0
 
 
+def Batch_MyApproxLSA(Batched_TruthTensor:torch.Tensor,row_lookups:torch.Tensor, maximize=True,lookahead=2):
+    # results=torch.zeros_like(Batched_TruthTensor,dtype=torch.bool)    
+    for _ in range(row_lookups.shape[-1]): # number of columns 
+        deltas=torch.topk(torch.clamp(Batched_TruthTensor,max=100),lookahead,dim=0,largest=maximize).values
+        col_index=torch.argmax(torch.abs(deltas[0])) 
+        row_index=torch.argmax(Batched_TruthTensor[:,col_index],dim=0) # BxB
+        Batched_TruthTensor[:,col_index]=0
+        Batched_TruthTensor[row_index,row_lookups[col_index]]=0
+        Batched_TruthTensor[row_index,col_index]=-1e-7
+    return Batched_TruthTensor<0
+
 @torch.no_grad()
 def lookup_sizes_vfast(sizes:torch.Tensor):
     return torch.diag(torch.ones_like(sizes)).repeat_interleave(sizes,dim=0).repeat_interleave(sizes,dim=1).to(dtype=torch.long,device=sizes.device)
